@@ -7,6 +7,7 @@
     <style>
         body {
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
@@ -15,21 +16,33 @@
         canvas {
             background-color: #000;
         }
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
     <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <button id="startButton">Start Game</button>
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
+        const startButton = document.getElementById("startButton");
 
         const box = 20;
         let snake = [{ x: 200, y: 200 }];
         let food = { x: 100, y: 100 };
         let dx = box, dy = 0;
         let score = 0;
+        let gameInterval = null;
+        let gameRunning = false;
 
         document.addEventListener("keydown", changeDirection);
+        startButton.addEventListener("click", startGame);
+
         function changeDirection(event) {
             const key = event.keyCode;
             if (key === 37 && dx === 0) { dx = -box; dy = 0; }
@@ -67,13 +80,24 @@
             if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height || 
                 snake.some(segment => segment.x === head.x && segment.y === head.y)) {
                 alert("Game Over! Score: " + score);
-                document.location.reload();
+                clearInterval(gameInterval);
+                gameRunning = false;
             }
             
             snake.unshift(head);
         }
 
-        setInterval(draw, 100);
+        function startGame() {
+            if (!gameRunning) {
+                snake = [{ x: 200, y: 200 }];
+                dx = box;
+                dy = 0;
+                score = 0;
+                food = { x: 100, y: 100 };
+                gameRunning = true;
+                gameInterval = setInterval(draw, 150);
+            }
+        }
     </script>
 </body>
 </html>
